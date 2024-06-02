@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, Response } from "express";
 import semaphoreRouter from "./controllers/semaphoreController";
 import mqtt from "mqtt";
 import cors from "cors";
@@ -22,6 +22,9 @@ app.all("*", filterBySessionId);
 app.use("/auth", auth);
 app.use("/semaphore", semaphoreRouter);
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+const PORT = 3000;
+const HOST = '172.31.23.248'; // Replace with your private IP address
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
 });
