@@ -61,8 +61,8 @@ async function createSemaphore(message: Buffer) {
     ],
   };
   try {
-    let semaphore = await SemaphoreSchema.findOne({name: json.name});
-    if (semaphore) {
+    let semaphore2 = await SemaphoreSchema.findOne({name: json.name});
+    if (semaphore2) {
       throw new Error("Semaphore already exists");
     }
     else {
