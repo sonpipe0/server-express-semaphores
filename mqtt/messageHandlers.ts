@@ -61,8 +61,14 @@ async function createSemaphore(message: Buffer) {
     ],
   };
   try {
-    let semaphoreObject = new SemaphoreSchema(semaphore);
-    await semaphoreObject.save();
+    const semaphore = await SemaphoreSchema.findOne({name: json.name});
+    if (semaphore) {
+      throw new Error("Semaphore already exists");
+    }
+    else {
+      let semaphoreObject = new SemaphoreSchema(semaphore);
+      await semaphoreObject.save();
+    }
   } catch (error) {
     //semaphore already exists
     console.log("Semaphore already exists");
