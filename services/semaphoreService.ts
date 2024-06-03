@@ -90,7 +90,7 @@ export async function updateSemaphoreActiveTime(
         dayList
     }: { id: string; dayList: Array<DayObject> } = req.body;
 
-    const semaphore = await SemaphoreSchema.findById(id);
+    const semaphore = await SemaphoreSchema.findOne({name: id});
     if (!semaphore) {
         return {status: 404, body: {message: "Semaphore not found"}};
     }
@@ -100,7 +100,8 @@ export async function updateSemaphoreActiveTime(
         }
     });
     try {
-        await SemaphoreSchema.findByIdAndUpdate(id, {operating_time: dayList});
+        await SemaphoreSchema.findOneAndUpdate({name: id}, {operating_time: dayList});
+        client.publish("semaphore/" + id + "/active/hours", JSON.stringify(dayList));
         return {
             status: 200,
             body: {message: "Semaphore operating time updated successfully"},

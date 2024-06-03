@@ -23,8 +23,6 @@ app.use("/auth", auth);
 app.use("/semaphore", semaphoreRouter);
 
 const PORT = 3000;
-const HOST = '172.31.23.248'; // Replace with your private IP address
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server is running on http://${HOST}:${PORT}`);
+app.listen(PORT, () => {
 });
