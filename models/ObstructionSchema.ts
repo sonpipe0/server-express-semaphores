@@ -1,13 +1,11 @@
 import mongoose from "mongoose";
 
 export interface Obstruction {
-  semaphore_id: string;
+  name: string;
   time: Date;
-  handled: boolean;
-  description: string;
 }
 
-export const ObstructionSchema = new mongoose.Schema({
+const obstructionSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -15,10 +13,7 @@ export const ObstructionSchema = new mongoose.Schema({
   time: {
     type: Date,
     required: true,
-  },
-  handled: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
+  }
 });
+
+export default mongoose.model("Obstruction", obstructionSchema);

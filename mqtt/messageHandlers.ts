@@ -1,8 +1,13 @@
 import SemaphoreSchema from "../models/semaphore";
+import ObstructionSchema from "../models/ObstructionSchema";
+import PedestrianSchema from "../models/PedestrianSchema";
+import log from "../models/logs";
 
 const messageHandlers = new Map<string, Function>();
 
 messageHandlers.set("semaphore/create", createSemaphore);
+messageHandlers.set("semaphore/obstructed", logObstruction)
+messageHandlers.set("semaphore/pedestrian", logPedestrian);
 
 export function handleMessage(topic: string, message: Buffer) {
   console.log("Message received: ", message.toString());
@@ -12,6 +17,52 @@ export function handleMessage(topic: string, message: Buffer) {
   } else {
     console.error("No handler for topic: ", topic);
   }
+}
+
+async function logObstruction(message:Buffer){
+  let json = JSON.parse(message.toString());
+  let semaphore = await SemaphoreSchema.findOne({name: json.name});
+  if(semaphore){
+    console.log("Obstruction detected in semaphore: ", semaphore.name);
+    let obstruction = {
+      name: semaphore.name,
+      time: new Date()
+    }
+    let obstructionObject = new ObstructionSchema(obstruction);
+    await obstructionObject.save();
+    let logged = {
+        semaphore_id: semaphore.name,
+        log: obstructionObject
+    }
+    let logObject = new log(logged);
+    await logObject.save();
+  }
+  else{
+    console.log("Semaphore not found");
+  }
+}
+
+async function logPedestrian(message:Buffer){
+    let json = JSON.parse(message.toString());
+    let semaphore = await SemaphoreSchema.findOne({name: json.name});
+    if(semaphore){
+        console.log("Pedestrian detected in semaphore: ", semaphore.name);
+        let pedestrian = {
+        name: semaphore.name,
+        time: new Date()
+        }
+        let pedestrianObject = new PedestrianSchema(pedestrian);
+        await pedestrianObject.save();
+        let logged = {
+            semaphore_id: semaphore.name,
+            log: pedestrianObject
+        }
+        let logObject = new log(logged);
+        await logObject.save();
+    }
+    else{
+        console.log("Semaphore not found");
+    }
 }
 
 async function createSemaphore(message: Buffer) {

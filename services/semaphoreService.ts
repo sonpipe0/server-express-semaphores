@@ -4,6 +4,8 @@ import {Request} from "express";
 import mongoose from "mongoose";
 import {StatusType} from "../types/statusTypes";
 import client from "../mqtt";
+import ObstructionSchema from "../models/ObstructionSchema";
+import PedestrianSchema from "../models/PedestrianSchema";
 
 function validateHour(time: string) {
     const hourRegex: RegExp = /^(0[0-9]|1[0-9]|2[0-3])$/;
@@ -151,6 +153,26 @@ export async function getSemaphoreInformation(req: Request): Promise<{ status: n
         });
     });
     return {status: 200, body: result};
+}
+
+export async function updateSemaphoreCounts(req: Request): Promise<{ status: number; body: any }> {
+    const { id }: { id: string } = req.body;
+    try {
+        const semaphore = await SemaphoreSchema.findOne({name: id});
+        if (semaphore) {
+            const obstructionCount = await ObstructionSchema.countDocuments({ name: id });
+            const pedestrianCount=await PedestrianSchema.countDocuments({name: id});
+            return { status: 200, body: {
+                obstructions: obstructionCount,
+                requests: pedestrianCount
+                }
+            };
+        } else {
+            return { status: 404, body: { message: "Semaphore not found" } };
+        }
+    } catch (error) {
+        return { status: 500, body: { message: "Internal server error", error } };
+    }
 }
 
 

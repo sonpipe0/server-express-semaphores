@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { ObstructionSchema } from "./ObstructionSchema";
 
 const log = new mongoose.Schema({
   semaphore_id: {
@@ -7,7 +6,9 @@ const log = new mongoose.Schema({
     required: true,
   },
   log: {
-    type: Schema.Types.Mixed, //pedestrian an obstruction
+    type: Schema.Types.Mixed, //pedestrian and obstruction
     required: false,
   },
 });
+
+export default mongoose.model("Log", log);

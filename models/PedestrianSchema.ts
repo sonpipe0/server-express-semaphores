@@ -10,3 +10,5 @@ const PedestrianSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+export default mongoose.model("Pedestrian", PedestrianSchema);
