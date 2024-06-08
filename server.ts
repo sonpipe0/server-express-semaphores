@@ -1,6 +1,5 @@
 import express, { Express, Response } from "express";
 import semaphoreRouter from "./controllers/semaphoreController";
-import mqtt from "mqtt";
 import cors from "cors";
 import auth from "./controllers/authController";
 import { connectToDatabase } from "./config/database";
@@ -14,8 +13,15 @@ app.use(express.json()); // To parse JSON bodies
 
 connectToDatabase();
 
-const topic: mqtt.MqttClient = client.subscribe("semaphore/create");
+client.on("connect", () => {
+    client.subscribe("semaphore/create");
+    client.subscribe("semaphore/obstruction");
 
+});
+
+client.on("message", (topic, message) => {
+    console.log(`Received message on ${topic}: ${message}`);
+});
 app.use(cors());
 app.all("*", filterBySessionId);
 

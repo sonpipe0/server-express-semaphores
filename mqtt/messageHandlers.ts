@@ -6,7 +6,7 @@ import log from "../models/logs";
 const messageHandlers = new Map<string, Function>();
 
 messageHandlers.set("semaphore/create", createSemaphore);
-messageHandlers.set("semaphore/obstructed", logObstruction)
+messageHandlers.set("semaphore/obstruction", logObstruction)
 messageHandlers.set("semaphore/pedestrian", logPedestrian);
 
 export function handleMessage(topic: string, message: Buffer) {
