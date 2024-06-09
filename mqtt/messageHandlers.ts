@@ -2,12 +2,14 @@ import SemaphoreSchema from "../models/semaphore";
 import ObstructionSchema from "../models/ObstructionSchema";
 import PedestrianSchema from "../models/PedestrianSchema";
 import log from "../models/logs";
+import client from "../mqtt";
 
 const messageHandlers = new Map<string, Function>();
 
 messageHandlers.set("semaphore/create", createSemaphore);
 messageHandlers.set("semaphore/obstruction", logObstruction)
 messageHandlers.set("semaphore/pedestrian", logPedestrian);
+messageHandlers.set("semaphore/start", sendStartConfiguration);
 
 export function handleMessage(topic: string, message: Buffer) {
   console.log("Message received: ", message.toString());
@@ -123,5 +125,21 @@ async function createSemaphore(message: Buffer) {
   } catch (error) {
     //semaphore already exists
     console.log("Semaphore already exists");
+    }
+}
+
+async function sendStartConfiguration(message: Buffer){
+    let json = JSON.parse(message.toString());
+    let semaphore = await SemaphoreSchema.findOne({name: json.name});
+    if(semaphore){
+        let configuration = {
+        red_time: semaphore.red_time,
+        green_time: semaphore.green_time,
+        operating_time: semaphore.operating_time
+        }
+        client.publish("semaphore/" + semaphore.name + "/start", JSON.stringify(configuration));
+    }
+    else{
+        console.log("Semaphore not found");
     }
 }

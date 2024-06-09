@@ -16,6 +16,8 @@ connectToDatabase();
 client.on("connect", () => {
     client.subscribe("semaphore/create");
     client.subscribe("semaphore/obstruction");
+    client.subscribe("semaphore/pedestrian");
+    client.subscribe("semaphore/start");
 
 });
 

@@ -122,12 +122,13 @@ export async function UpdateSemaphoreTiming(
         green_time,
         red_time
     }: { id: string; green_time: number; red_time: number } = req.body;
-    const semaphore = await SemaphoreSchema.findById(id);
+    const semaphore = await SemaphoreSchema.findOne({name: id});
     if (!semaphore) {
         return {status: 404, body: {message: "Semaphore not found"}};
     }
     try {
-        await SemaphoreSchema.findByIdAndUpdate(id, {green_time: green_time, red_time: red_time});
+        await SemaphoreSchema.findOneAndUpdate({name: id}, {green_time: green_time, red_time: red_time});
+        client.publish("semaphore/" + id + "/timing", JSON.stringify({green_time: green_time, red_time: red_time}));
     } catch (err: any) {
         return {status: 400, body: {message: err.message}};
     }
