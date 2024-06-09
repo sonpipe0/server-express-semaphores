@@ -135,12 +135,19 @@ export async function UpdateSemaphoreTiming(
 }
 
 export async function getSemaphoreInformation(req: Request): Promise<{ status: number; body: any }> {
-    const semaphores = await SemaphoreSchema.find({},{_id:1, name:1, status:1, green_time:1, red_time:1, operating_time:1});
+    const semaphores = await SemaphoreSchema.find({}, {
+        _id: 1,
+        name: 1,
+        status: 1,
+        green_time: 1,
+        red_time: 1,
+        operating_time: 1
+    });
     const result: Semaphore[] = [];
     semaphores.forEach((semaphore) => {
         const active_time: DayObject[] = [];
         semaphore.operating_time.forEach((day) => {
-            const dayObject: DayObject = { day: day.day as string, open: day.open as string, close: day.close as string};
+            const dayObject: DayObject = {day: day.day as string, open: day.open as string, close: day.close as string};
             active_time.push(dayObject);
         });
         result.push({
@@ -156,27 +163,29 @@ export async function getSemaphoreInformation(req: Request): Promise<{ status: n
 }
 
 export async function updateSemaphoreCounts(req: Request): Promise<{ status: number; body: any }> {
-    const { id }: { id: string } = req.body;
+    const id: string = req.query.id as string;
+    console.log(id)
     try {
         const semaphore = await SemaphoreSchema.findOne({name: id});
         if (semaphore) {
-            const obstructionCount = await ObstructionSchema.countDocuments({ name: id });
-            const pedestrianCount=await PedestrianSchema.countDocuments({name: id});
-            return { status: 200, body: {
-                obstructions: obstructionCount,
-                requests: pedestrianCount
+            const obstructionCount = await ObstructionSchema.countDocuments({name: id});
+            const pedestrianCount = await PedestrianSchema.countDocuments({name: id});
+            return {
+                status: 200, body: {
+                    obstructions: obstructionCount,
+                    requests: pedestrianCount
                 }
             };
         } else {
-            return { status: 404, body: { message: "Semaphore not found" } };
+            return {status: 404, body: {message: "Semaphore not found"}};
         }
     } catch (error) {
-        return { status: 500, body: { message: "Internal server error", error } };
+        return {status: 500, body: {message: "Internal server error", error}};
     }
 }
 
 
-interface Semaphore{
+interface Semaphore {
     id: string,
     name: string,
     status: StatusType,

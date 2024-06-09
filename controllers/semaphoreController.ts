@@ -51,7 +51,7 @@ router.post("/update-timing", async (req: Request, res: Response) => {
     res.status(status).json(body);
 });
 
-router.post("/update-counts", async (req: Request, res: Response) => {
+router.get("/update-counts", async (req: Request, res: Response) => {
     const {status, body} : {status: number; body: any} = await updateSemaphoreCounts(req);
     res.status(status).json(body);
 });
